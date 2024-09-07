@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 0
   nameMainan: Stik Eskrim
   descMainan: Stik kayu kecil yang diadukan dengan menepuk tangan dan lantai.
-  price: 2
-  stok: 5
-  timerRestock: 5
+  price: 10
   priceToUnlock: 0
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 2
+  isSpecialActive: 0

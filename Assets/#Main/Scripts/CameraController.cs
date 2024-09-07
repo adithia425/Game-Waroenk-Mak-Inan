@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public bool isCameraCanMoving;
+
     public Camera mainCamera;
     public float panSpeed = 20f;
     public float panBorderThickness = 10f;
@@ -15,6 +17,8 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        if (!isCameraCanMoving) return;
+
         Vector3 pos = transform.position;
 
         if (Input.GetKey("w") || Input.mousePosition.y >= Screen.height - panBorderThickness)

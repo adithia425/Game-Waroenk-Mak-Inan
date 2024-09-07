@@ -9,10 +9,7 @@ public class PanelTutorial : MonoBehaviour
 {
     public UnityEvent actionEnd;
 
-    public Image[] tutorialImages; // Array of tutorial images
-    public Image[] indicators; // Array of indicator images
-    public Sprite indicatorActiveSprite; // Sprite for active indicator (e.g., star)
-    public Sprite indicatorInactiveSprite; // Sprite for inactive indicator (e.g., dot)
+    public Image[] tutorialImages; 
     public Button buttonPrev;
     public Button buttonNext;
 
@@ -57,12 +54,6 @@ public class PanelTutorial : MonoBehaviour
         for (int i = 0; i < tutorialImages.Length; i++)
         {
             tutorialImages[i].gameObject.SetActive(i == currentIndex);
-        }
-
-        // Update indicators
-        for (int i = 0; i < indicators.Length; i++)
-        {
-            indicators[i].sprite = (i == currentIndex) ? indicatorActiveSprite : indicatorInactiveSprite;
         }
     }
 }

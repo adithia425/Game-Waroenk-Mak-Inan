@@ -8,21 +8,20 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    [Header("References")]
     public CanvasManager canvas;
-    public DatabaseManager database;
+    public CameraController cameraController;
     public CashierController cashierController;
     public ThiefManager thiefManager;
+    public CatManager catManager;
 
+
+    [Header("Data Main")]
     [SerializeField]
     private int currentMoney;
     private int currentPopularity;
-
     public int counterTargetPopularity;
 
-
-    //public int levelUnlockMainan;
-
-    private Mainan[] mainanArray;
 
     [Header("Pop Up")]
     public GameObject panelPopUp;
@@ -39,14 +38,16 @@ public class GameManager : MonoBehaviour
     public bool isTestingTheif;
 
     [Header("Time")]
-    public float currentTime; // Waktu dalam detik sejak jam 08:00
-    private const string TimePrefKey = "GameTime";
+    public bool isTimePlay;
+    public bool isClosedShop;
+    [SerializeField] private int startTime = 8 * 60;
+    [SerializeField] private int endTime = 17 * 60;
+    public float currentTime;
+    public int timeScaleFactor;
 
     private void Awake()
     {
         instance = this;
-
-        mainanArray = (Mainan[])System.Enum.GetValues(typeof(Mainan));
     }
 
     private void Start()
@@ -59,17 +60,54 @@ public class GameManager : MonoBehaviour
         int lvPop = SaveManager.instance.GetLevelPopularity();
         canvas.SetTextNamePopularity(lvPop);
 
-        if (PlayerPrefs.HasKey(TimePrefKey))
-        {
-            currentTime = PlayerPrefs.GetFloat(TimePrefKey);
-        }
-        else
-        {
-            currentTime = 8 * 60 * 60; // Mulai dari jam 08:00 (8 jam dalam detik)
-        }
 
+        PrepareScene();
         UpdateTimeDisplay();
     }
+
+    private void PrepareScene()
+    {
+        currentTime = startTime;
+        canvas.SetTextDay(SaveManager.instance.GetDay().ToString());
+
+
+        //Apakah selesai berbelanja
+        if (PlayerPrefs.GetInt("PlayMiniGame") == 1)
+        {
+            PlayerPrefs.SetInt("PlayMiniGame", 0);
+
+
+            MusicManager.instance.PlaySFX(SFX.OPENSHOP);
+
+            ShelfManager.instance.SetShelf();
+
+            //Get Data barang yang berhasil diambil, tambahkan ke etalase
+            List<int> listStockCollect = DatabaseManager.instance.listCounterMainanCollected;
+            ShelfManager.instance.SetUpStockShelf(listStockCollect);
+
+            canvas.PanelPrepare(false);
+            isClosedShop = false;
+            isTimePlay = true;
+            return;
+        }
+
+
+        ShelfManager.instance.SetShelf();
+        //Jika belum berbelanja
+        canvas.PanelPrepare(true);
+        isClosedShop = true;
+        isTimePlay = false;
+    }
+    public void OpenShop()
+    {
+        MusicManager.instance.PlaySFX(SFX.OPENSHOP);
+        ShelfManager.instance.SetShelf();
+        canvas.PanelPrepare(false);
+        isTimePlay = true;
+        isClosedShop = false;
+
+    }
+
 
     public int GetCurrentMoney()
     {
@@ -110,27 +148,72 @@ public class GameManager : MonoBehaviour
     }
    
 
-    public int GetIndexMainan(Mainan mainan)
+/*    public int GetIndexMainan(Mainan mainan)
     {
         return System.Array.IndexOf(mainanArray, mainan);
-    }
+    }*/
 
     void Update()
     {
         canvas.SetTextMoney(currentMoney);
         canvas.SetTextPopularity(currentPopularity, GetTargetPopularity());
 
-        currentTime += Time.deltaTime;
-
-        // Reset waktu jika sudah melewati 24 jam
-        if (currentTime >= 24 * 60 * 60)
+        if (isTimePlay)
         {
-            currentTime -= 24 * 60 * 60;
-        }
+            currentTime += Time.deltaTime * timeScaleFactor;
 
+            if (currentTime >= endTime)
+            {
+                currentTime = endTime;
+                isTimePlay = false;
+                ClosedShop();
+            }
+
+        }
         UpdateTimeDisplay();
     }
 
+    public void StopTime()
+    {
+        isTimePlay = false;
+    }
+    public void PlayTime()
+    {
+        if (isClosedShop) return;
+        isTimePlay = true;
+    }
+
+    public void ClosedShop()
+    {
+        CheckTurnOffFastTime();
+
+
+        isClosedShop = true;
+        isTimePlay = false;
+
+        MusicManager.instance.PlaySFX(SFX.CLOSESHOP);
+        NpcManager.instance.ForceNPCToQuit();
+        SaveManager.instance.ResetDay();
+
+        //panel recap active dan init
+
+        //canvas.SetTextClosedShop("Klik untuk berganti hari");
+        canvas.PanelRecap(true);
+    }
+
+    public void ChangeDay()
+    {
+        SaveManager.instance.AddDay();
+        ScenesManager.instance.ChangeScene("GamePlay");
+    }
+
+
+    private void ClosedToOpen()
+    {
+        PrepareScene();
+        UpdateTimeDisplay();
+        canvas.PanelLoading(false);
+    }
 
     public void ShowPanelPopUp(string desc)
     {
@@ -152,6 +235,11 @@ public class GameManager : MonoBehaviour
         isTestingTheif = con;
     }
 
+    public void CheckTurnOffFastTime()
+    {
+        if (isFastForward)
+            ChangeFastForward();
+    }
     public void ChangeFastForward()
     {
         isFastForward = !isFastForward;
@@ -172,15 +260,9 @@ public class GameManager : MonoBehaviour
     //Time
     void UpdateTimeDisplay()
     {
-        int hours = Mathf.FloorToInt(currentTime / 3600);
-        int minutes = Mathf.FloorToInt((currentTime % 3600) / 60);
-        int seconds = Mathf.FloorToInt(currentTime % 60);
-        canvas.SetTextTime(minutes.ToString("00") + ":" + seconds.ToString("00"));
+        int hours = Mathf.FloorToInt(currentTime / 60);
+        int minutes = Mathf.FloorToInt((currentTime % 60));
+        canvas.SetTextTime(hours.ToString("00") + ":" + minutes.ToString("00"));
     }
 
-    public void SaveTime()
-    {
-        PlayerPrefs.SetFloat(TimePrefKey, currentTime);
-        PlayerPrefs.Save();
-    }
 }

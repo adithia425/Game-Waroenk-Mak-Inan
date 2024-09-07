@@ -27,10 +27,6 @@ public class NpcManager : MonoBehaviour
         SetSpawnNPC();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
 
     public void SetSpawnNPC()
     {
@@ -42,6 +38,12 @@ public class NpcManager : MonoBehaviour
 
     public void SpawnNPC()
     {
+        if (!GameManager.instance.isTimePlay)
+        {
+            SetSpawnNPC();
+            return;
+        }
+
         List<NpcController> inactiveNPCs = new List<NpcController>();
         NpcController choosedNPC;
 
@@ -55,7 +57,7 @@ public class NpcManager : MonoBehaviour
 
         //Ambil data level popularitas
         int levelCap = SaveManager.instance.dataInformation.levelCapacity;
-        maxNPCSpawn = GameManager.instance.database.GetCountCapacity(levelCap);
+        maxNPCSpawn = DatabaseManager.instance.GetCountCapacity(levelCap);
 
         if (listNpc.Count - inactiveNPCs.Count >= maxNPCSpawn)
         {
@@ -81,4 +83,16 @@ public class NpcManager : MonoBehaviour
         SetSpawnNPC();
     }
 
+
+
+    public void ForceNPCToQuit()
+    {
+        for (int i = 0; i < listNpc.Count; i++)
+        {
+            if(listNpc[i].gameObject.activeSelf)
+            {
+                listNpc[i].ForceToQuit();
+            }
+        }
+    }
 }

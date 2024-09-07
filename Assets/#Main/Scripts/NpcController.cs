@@ -14,11 +14,11 @@ public class NpcController : MonoBehaviour
     public ActionNPC actionNPC;
 
     [Header("Main")]
-    public bool testingThief;
     public bool isThief;
     public bool isBoy;
-    public GameObject modelBoy;
-    public GameObject modelGirl;
+    public int idxSkin;
+    public List<GameObject> listModelBoy;
+    public List<GameObject> listModelGirl;
 
     [Header("Icon Bar")]
     public GameObject panelIcon;
@@ -26,7 +26,7 @@ public class NpcController : MonoBehaviour
     public Sprite spriteAngry;
     public Sprite spriteHappy;
     public Sprite spriteThief;
-    //public Sprite spriteSandal;
+    public Sprite spriteSandal;
 
     [Header("Utils")]
     public GameObject objPegang;
@@ -49,9 +49,13 @@ public class NpcController : MonoBehaviour
     RaycastHit hit;
 
     [Header("Component")]
-    public NpcAnimation animBoy;
-    public NpcAnimation animGirl;
+    public List<NpcAnimation> listAnimBoy;
+    public List<NpcAnimation> listAnimGirl;
 
+
+    [Header("Data Number")]
+    [Range(0f,1f)]
+    public float chancesThief;
 
 
 /*    [Header("Event")]
@@ -63,30 +67,54 @@ public class NpcController : MonoBehaviour
 
     public void SetNPC()
     {
+        GameManager gm = GameManager.instance;
+
         //Pilih Gender
         isBoy = Random.Range(0f, 1f) < 0.5f ?  true : false;
 
 
-        isThief = Random.Range(0f, 1f) < 0.1f ? true : false;
+        isThief = Random.Range(0f, 1f) < chancesThief ? true : false;
+        if (gm.thiefManager.isShooting) isThief = false;
 
-        if (GameManager.instance.isTestingTheif) isThief = true;
+        if (gm.isTestingTheif) isThief = true;
 
+        idxSkin = Random.Range(0, 3);
         if (isBoy)
         {
-            modelBoy.SetActive(true);
-            modelGirl.SetActive(false);
+            for (int i = 0; i < listModelBoy.Count; i++)
+            {
+                if(i == idxSkin)
+                {
+                    listModelBoy[i].SetActive(true);
+                }
+                else
+                {
+                    listModelBoy[i].SetActive(false);
+                }
+                listModelGirl[i].SetActive(false);
+            }
         }
         else
         {
-            modelBoy.SetActive(false);
-            modelGirl.SetActive(true);
+            for (int i = 0; i < listModelGirl.Count; i++)
+            {
+                if (i == idxSkin)
+                {
+                    listModelGirl[i].SetActive(true);
+                }
+                else
+                {
+                    listModelGirl[i].SetActive(false);
+                }
+                listModelBoy[i].SetActive(false);
+            }
         }
 
         //Pilih mainan
         choosedMainan = GetRandomMainan();
         Destroy(objPegang);
 
-        imageIcon.sprite = GameManager.instance.database.GetImageMainan(choosedMainan);
+        imageIcon.sprite = DatabaseManager.instance.GetImageMainan(choosedMainan);
 
         posTarget = ShelfManager.instance.GetPosNPCShelf(choosedMainan);
         agent.SetDestination(posTarget.position);
@@ -115,9 +143,9 @@ public class NpcController : MonoBehaviour
         if (posTarget != null && !agent.pathPending)
         {
             if (isBoy)
-                animBoy.SetWalking(true);
+                listAnimBoy[idxSkin].SetWalking(true);
             else
-                animGirl.SetWalking(true);
+                listAnimGirl[idxSkin].SetWalking(true);
 
             switch (actionNPC)
             {
@@ -158,9 +186,9 @@ public class NpcController : MonoBehaviour
         else
         {
             if (isBoy)
-                animBoy.SetWalking(false);
+                listAnimBoy[idxSkin].SetWalking(false);
             else
-                animGirl.SetWalking(false);
+                listAnimGirl[idxSkin].SetWalking(false);
         }
 
 
@@ -182,18 +210,19 @@ public class NpcController : MonoBehaviour
         }
 
 
-/*        if (Input.GetMouseButtonDown(0))
-        {
-            var camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(camRay, out hit))
-            {
-                Debug.Log(hit.transform.name);
-                //posTarget = null;
-                //Show panel thief
-                //GameManager.instance.ShowPanelThief(this);
-                
-            }
-        }*/
+        /*        if (Input.GetMouseButtonDown(0))
+                {
+                    var camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    if(Physics.Raycast(camRay, out hit))
+                    {
+                        Debug.Log(hit.transform.name);
+                        //posTarget = null;
+                        //Show panel thief
+                        //GameManager.instance.ShowPanelThief(this);
+
+                    }
+                }*/
+
     }
 
 
@@ -212,7 +241,12 @@ public class NpcController : MonoBehaviour
                 //Cek jika urutan pertama
                 break;
             case ActionNPC.PAY:
-                Invoke(nameof(ActionPay), timerPayCashier);
+
+                //Get time cashier sesuai level
+                int levelKeuangan = SaveManager.instance.GetLevelKeuangan();
+                float timePay = DatabaseManager.instance.GetEffectKeuangan(levelKeuangan);
+
+                Invoke(nameof(ActionPay), timePay);
                 break;
             case ActionNPC.OUT:
                 ActionOut();
@@ -234,12 +268,18 @@ public class NpcController : MonoBehaviour
             if (isThief)
             {
                 ActionThief();
+                if (GameManager.instance.thiefManager.TriggerSkillKeamanan(gameObject))
+                {
+                    StopThiefAuto();
+                }
             }
             else
             {
+                int indexMainan = DatabaseManager.instance.GetIndexMainan(choosedMainan);
+                DatabaseManager.instance.AddListMainanSold(indexMainan);
                 GameManager.instance.cashierController.AddNPCToQueue(gameObject);
             }
-            objPegang = Instantiate(GameManager.instance.database.GetObjectMainan(choosedMainan), posPegang.position, posPegang.rotation, posPegang);
+            objPegang = Instantiate(DatabaseManager.instance.GetObjectMainan(choosedMainan), posPegang.position, posPegang.rotation, posPegang);
         }
         else
         {
@@ -266,27 +306,34 @@ public class NpcController : MonoBehaviour
     {
         if (!isThief) return;
 
+        if (GameManager.instance.thiefManager.isShooting) return;
+
         counterTimerAntiBug = 120;
         agent.isStopped = true;
         posTarget = null;
         GameManager.instance.ShowPanelThief(gameObject);
     }
 
+    public void StopThiefAuto()
+    {
+        counterTimerAntiBug = 120;
+        agent.isStopped = true;
+        posTarget = null;
+    }
+
     public void ActionThief()
     {
         imageIcon.sprite = spriteThief;
-        posTarget = NpcManager.instance.posOut;
-        agent.SetDestination(posTarget.position);
-        actionNPC = ActionNPC.OUT;
+
+        MakeNPCQuit();
     }
     public void ActionThiefSuccess()
     {
         //NPC Kabur
         agent.isStopped = false;
         GameManager.instance.AddPopularity(-3);
-        posTarget = NpcManager.instance.posOut;
-        agent.SetDestination(posTarget.position);
-        actionNPC = ActionNPC.OUT;
+
+        MakeNPCQuit();
     }
 
     public void ActionThiefFailed()
@@ -308,39 +355,60 @@ public class NpcController : MonoBehaviour
 
         imageIcon.sprite = spriteHappy;
         GameManager.instance.AddMoney(ShelfManager.instance.GetPriceShelf(choosedMainan));
-        posTarget = NpcManager.instance.posOut;
-        agent.SetDestination(posTarget.position);
-        actionNPC = ActionNPC.OUT;
-    }
 
+        MakeNPCQuit();
+    }
+    private void ActionAngry()
+    {
+        GameManager.instance.AddPopularity(-2);
+        imageIcon.sprite = spriteAngry;
+
+        MakeNPCQuit();
+    }
     private void ActionOut()
     {
         actionNPC = ActionNPC.SPAWN;
         gameObject.SetActive(false);
     }
 
-    private void ActionAngry()
+
+    private void MakeNPCQuit()
     {
-        GameManager.instance.AddPopularity(-2);
-        imageIcon.sprite = spriteAngry;
         posTarget = NpcManager.instance.posOut;
         agent.SetDestination(posTarget.position);
         actionNPC = ActionNPC.OUT;
     }
 
 
-
     //Selesai Antrian
     public void FinishPaying()
     {
-        GameManager.instance.cashierController.ProcessNextNPC();
+        CashierController cashier = GameManager.instance.cashierController;
+        MusicManager.instance.PlaySFX(SFX.GETMONEY);
+        cashier.ShowMoneyVFX();
+        cashier.ProcessNextNPC();
     }
 
 
+    /*    private void DetectionHover()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-/*    private void OnMouseEnter()
+            // Menembakkan raycast
+            if (isThief)
+            {
+                if (Physics.Raycast(ray, out hit))
+                {
+                    // Jika raycast mengenai sesuatu dengan collider, lakukan sesuatu
+                    Debug.Log("Raycast mengenai: " + hit.collider.gameObject.name);
+                }
+            }
+        }*/
+
+    private void OnMouseEnter()
     {
-        if(isThief)
+        if (isThief)
         {
             imageIcon.sprite = spriteSandal;
         }
@@ -354,7 +422,7 @@ public class NpcController : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
+/*    private void OnMouseDown()
     {
         if (isThief)
         {
@@ -362,6 +430,18 @@ public class NpcController : MonoBehaviour
         }
     }*/
 
+
+    public void ForceToQuit()
+    {
+        if (actionNPC == ActionNPC.PAY)
+        {
+            return;
+        }
+        else
+        {
+            MakeNPCQuit();
+        }
+    }
 }
 
 public enum ActionNPC

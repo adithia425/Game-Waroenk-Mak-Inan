@@ -12,7 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a60cd18ed58bc914aaf0d4b44d4b465c, type: 3}
   m_Name: Data Information
   m_EditorClassIdentifier: 
-  money: 0
+  money: 100
   popularity: 0
   levelPopularity: 1
+  maxLevelPopularity: 10
   levelCapacity: 1
+  maxLevelCapacity: 10
+  levelKeuangan: 1
+  maxLevelKeuangan: 3
+  levelKeamanan: 1
+  maxLevelKeamanan: 3
+  counterDay: 1
+  eventMajorMixUhey: 0
+  eventMajorKucingMalang: 0

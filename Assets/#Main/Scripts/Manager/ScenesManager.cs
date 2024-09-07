@@ -1,17 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
     public static ScenesManager instance;
 
-    public GameObject panelLoading;
-
     public string nameScene;
     public float timeDelay;
 
+    public GameObject panelLoading;
+
+
+    [Header("Event")]
+    public UnityEvent onChangeScene;
 
     private void Awake()
     {
@@ -32,6 +36,7 @@ public class ScenesManager : MonoBehaviour
     {
         this.nameScene = nameScene;
         panelLoading.SetActive(true);
+        onChangeScene?.Invoke();
 
         Time.timeScale = 1;
 
@@ -47,5 +52,6 @@ public class ScenesManager : MonoBehaviour
     {
         Application.Quit();
     }
+
 
 }

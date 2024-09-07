@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using UnityEngine.Events;
 
 public class ShelfController : MonoBehaviour
 {
@@ -10,7 +12,26 @@ public class ShelfController : MonoBehaviour
     public int indexMainan;
     public bool isUnlock;
 
-    public int currentStok;
+    [SerializeField]
+    private int currentStock;
+    public int CurrentStock
+    {
+        get
+        {
+            return currentStock;
+        }
+        set
+        {
+            currentStock = value;
+
+            RefreshStock();
+            PlayerPrefs.SetInt( $"{PlayerPrefName.COUNTSHELF}{indexMainan}", currentStock);
+
+
+        }
+    }
+
+
     public GameObject objectMainan;
     public List<GameObject> listObjectMainan;
     public List<Transform> listPosMainan;
@@ -18,27 +39,71 @@ public class ShelfController : MonoBehaviour
 
     public Transform posNPC;
 
-    [Header("Restock")]
-    public bool isOnRestock;
-    public float counterTimeRestock;
-    public GameObject panelRestock;
-    public Button buttonRestock;
-    public Image imageIcon;
-
-    public Sprite spriteStokEmpty;
-    public Sprite spriteLoading;
+    [Header("Upgrade")]
+    public List<Color> listColorLevel;
+    public Renderer objectRenderer1;
+    public Renderer objectRenderer2;
 
 
-    public void SetDataShelf(int index, int levelPrice, int levelRestock, int basePrice, int maxStok, int timeRestock)
+    [Header("References")]
+    public GameObject panelStock;
+    public TextMeshProUGUI textStock;
+    public Image iconMainan;
+
+
+    [Header("Event")]
+    public UnityEvent onDecrementStock;
+
+
+    [Header("Model")]
+    public GameObject vfxSpecial;
+    public GameObject vfxUpgrade;
+
+    public void SetStock()
+    {
+        //panelRestock.SetActive(false);
+
+
+        if (!isUnlock)
+        {
+            panelStock.SetActive(false);
+            return;
+        }
+
+        //Ubah jadi get stock dari database manager
+        //currentStok = mainan.maxStock;
+
+        //Jika sudah unlock
+
+        iconMainan.sprite = DatabaseManager.instance.GetImageMainan(indexMainan);
+        panelStock.SetActive(true);
+
+        //RefreshStock();
+    }
+
+
+    public void SetDataShelf(int index, int levelPrice, int basePrice, int currentStock, bool isSpecialActive)
     {
         indexMainan = index;
         mainan.levelPrice = levelPrice;
-        mainan.levelTimerRestock = levelRestock;
+        objectRenderer1.material.color = listColorLevel[levelPrice - 1];
+        objectRenderer2.material.color = listColorLevel[levelPrice - 1];
+        //mainan.levelTimerRestock = levelRestock;
 
         mainan.basePrice = basePrice;
-        mainan.maxStock = maxStok;
-        mainan.timerRestock = timeRestock;
+        //mainan.maxStock = maxStok;
+        //mainan.timerRestock = timeRestock;
+
+        CurrentStock = currentStock;
+        //Debug.Log($"Last Stock {mainan.typeMainan} : {CurrentStock}");
+
+
+        vfxSpecial.SetActive(isSpecialActive);
+
+
+        iconMainan.sprite = DatabaseManager.instance.GetImageMainan(indexMainan);
     }
+
     public Transform GetPosNPC()
     {
         return posNPC;
@@ -51,7 +116,7 @@ public class ShelfController : MonoBehaviour
 
     void Start()
     {
-        objectMainan = GameManager.instance.database.GetObjectMainan(mainan.typeMainan);
+        objectMainan = DatabaseManager.instance.GetObjectMainan(mainan.typeMainan);
         int countStock = listPosMainan.Count;
 
         for (int i = 0; i < countStock; i++)
@@ -61,11 +126,11 @@ public class ShelfController : MonoBehaviour
             objMainan.SetActive(false);
         }
 
-        SetStock();
+        RefreshStock();
     }
 
 
-    void Update()
+/*    void Update()
     {
         if (!isUnlock) return;
 
@@ -82,28 +147,53 @@ public class ShelfController : MonoBehaviour
 
         //Tambahan
         panelRestock.transform.forward = Camera.main.transform.forward;
-    }
+    }*/
 
-    public void SetStock()
-    {
-        panelRestock.SetActive(false);
 
-        if(!isUnlock)
-        {
-            return;
-        }
 
-        currentStok = mainan.maxStock;
-        RefreshStock();
-    }
 
     public void RefreshStock()
+    {
+        RefreshStockModel();
+        RefreshStockUI();
+    }
+
+/*    public void Restock()
+    {
+        buttonRestock.interactable = false;
+        imageIcon.sprite = spriteLoading;
+
+        isOnRestock = true;
+        counterTimeRestock = mainan.GetTimmerRestock();
+    }*/
+
+    public bool DecrementStok()
+    {
+        if (CurrentStock <= 0) return false;
+
+        CurrentStock--;
+        onDecrementStock?.Invoke();
+
+/*        if(currentStok <= 0)
+        {
+            panelRestock.SetActive(true);
+            buttonRestock.interactable = true;
+            imageIcon.sprite = spriteStokEmpty;
+        }*/
+
+        //Hilangkan object Mainan di etalase
+        //RefreshStock();
+        return true;
+    }
+
+
+    private void RefreshStockModel()
     {
         for (int i = 0; i < listObjectMainan.Count; i++)
         {
             if (listObjectMainan[i] == null) continue;
 
-            if(i < currentStok)
+            if (i < CurrentStock)
             {
                 listObjectMainan[i].SetActive(true);
             }
@@ -113,34 +203,15 @@ public class ShelfController : MonoBehaviour
             }
         }
     }
-
-    public void Restock()
+    private void RefreshStockUI()
     {
-        buttonRestock.interactable = false;
-        imageIcon.sprite = spriteLoading;
-
-        isOnRestock = true;
-        counterTimeRestock = mainan.GetTimmerRestock();
-    }
-
-    public bool DecrementStok()
-    {
-        if (currentStok <= 0) return false;
-
-        currentStok--;
-
-        if(currentStok <= 0)
-        {
-            panelRestock.SetActive(true);
-            buttonRestock.interactable = true;
-            imageIcon.sprite = spriteStokEmpty;
-        }
-
-        //Hilangkan object Mainan di etalase
-        RefreshStock();
-        return true;
+        textStock.text = CurrentStock.ToString();
     }
 
 
+    public void PlayVFXUpgrade()
+    {
+        vfxUpgrade.SetActive(true);
+    }
 
 }

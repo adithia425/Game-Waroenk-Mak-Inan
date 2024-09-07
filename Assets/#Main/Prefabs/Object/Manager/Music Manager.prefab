@@ -176,11 +176,22 @@ MonoBehaviour:
   audioSFX: {fileID: 9051063822023602487}
   musicSplashScreen: {fileID: 8300000, guid: d7de3008ad85a3f44bafeb983c4a4653, type: 3}
   sfxLevelUpPop: {fileID: 8300000, guid: 287fe993a2b10a04e8918b4311a8852e, type: 3}
-  sfxWinMiniGame: {fileID: 8300000, guid: cc6e082d1863c714ea45558ea5b6b02a, type: 3}
-  sfxLemparSendal: {fileID: 8300000, guid: ca9657e51d3a32d42964a3b8652059c8, type: 3}
-  sfxNPCHilang: {fileID: 8300000, guid: 0ceeeac258ec2cf469ad872ee2ebd0f0, type: 3}
-  sfxPopUpNotif: {fileID: 8300000, guid: 80213c201d507244caaad1f9f383913b, type: 3}
-  sfxButtonUpgrade: {fileID: 8300000, guid: 70573dab022e96e4192f1e91a8194fcf, type: 3}
+  sfxWinMiniGame: {fileID: 8300000, guid: 61d4c5e4c403d384690f85bb5f8f016d, type: 3}
+  sfxPopUpNotif: {fileID: 8300000, guid: e6883d41bcc766242bc46bccd80c9f17, type: 3}
+  sfxGetMoney: {fileID: 8300000, guid: 6d1046cd54797964199a8010dea27cd4, type: 3}
+  sfxOpen: {fileID: 8300000, guid: 429faaefc2ef75841ad8e696c95b4095, type: 3}
+  sfxClose: {fileID: 8300000, guid: bc4e4c7ba1c1cfe4e829444c6572f569, type: 3}
+  sfxFast: {fileID: 8300000, guid: c6c95611deff1554a83833f6700df96f, type: 3}
+  sfxLemparSendal: {fileID: 8300000, guid: 24f0526485eb7924dae63149502053e2, type: 3}
+  sfxNPCHilang: {fileID: 8300000, guid: d8c42a890d74db245a0a06a2686e7724, type: 3}
+  sfxButtonUpgrade: {fileID: 8300000, guid: cad183b4d1ce77e4389d3825d6fdcd0c, type: 3}
+  sfxButtonClick: {fileID: 8300000, guid: b7b26cace78813949bde424540f000c7, type: 3}
+  sfxButtonCancel: {fileID: 8300000, guid: 04b270cf87f4e5541a47254feedbfd3b, type: 3}
+  sfxMiniGameCorrect: {fileID: 8300000, guid: 894380b52f1ca204a9f405509400cf39, type: 3}
+  sfxMiniGameWrong: {fileID: 8300000, guid: 56cc91a0c5a5eb8499b8f5d0f8f9672b, type: 3}
+  sfxMiniGameSE: {fileID: 8300000, guid: d1fad3bf2c9043e4cad3564249d74ea3, type: 3}
+  sfx321gas: {fileID: 8300000, guid: 7f18069a0744ed940ad612f79b70bef4, type: 3}
+  sfxswipe: {fileID: 8300000, guid: a10b735c899fc4a46921788ae92bee52, type: 3}
 --- !u!1 &9051063822069831790
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ public class ShelfManager : MonoBehaviour
 {
     public static ShelfManager instance;
 
+    public UpgradeUIManager uiManager;
     public List<ShelfController> listShelfController;
 
 
@@ -13,39 +14,72 @@ public class ShelfManager : MonoBehaviour
     {
         instance = this;
     }
-    void Start()
-    {
-        SetShelf();
-    }
+
     public void SetShelf()
     {
+        SaveManager sm = SaveManager.instance;
         ListDataShelf listData = SaveManager.instance.listDataShelf;
         for (int i = 0; i < listData.dataShelf.Length; i++)
         {
+            int countCurrentStock = PlayerPrefs.GetInt($"{PlayerPrefName.COUNTSHELF}{i}");
+
+
             listShelfController[i].SetDataShelf(i,
                 listData.dataShelf[i].levelPrice, 
-                listData.dataShelf[i].levelRestock,
                 listData.dataShelf[i].price,
-                listData.dataShelf[i].stok,
-                listData.dataShelf[i].timerRestock);
+                countCurrentStock,
+                sm.GetSpecialActive(listData.dataShelf[i].mainan)
+                );
+
+            listShelfController[i].onDecrementStock.AddListener(OnDecrementStock);
         }
 
-        for (int i = 0; i < listShelfController.Count; i++)
-        {
-            if (i < SaveManager.instance.GetLevelShelf())
-            {
-                GameManager.instance.canvas.SetShelfUI(i, true);
+        int countMainan = listShelfController.Count;
+        int levelShelf = SaveManager.instance.GetLevelShelf();
 
+        //Shelf UI Upgrade
+        for (int i = 0; i < countMainan; i++)
+        {
+            if (i < levelShelf)
+            {
+                //GameManager.instance.canvas.SetShelfUI(i, true);
 
                 listShelfController[i].isUnlock = true;
-                listShelfController[i].SetStock();
+                uiManager.SetUpShelfUI(i,true);
             }
             else
             {
-                GameManager.instance.canvas.SetShelfUI(i, false);
+                //GameManager.instance.canvas.SetShelfUI(i, false);
 
                 listShelfController[i].isUnlock = false;
+                uiManager.SetUpShelfUI(i, false);
             }
+
+
+            listShelfController[i].SetStock();
+        }
+
+        for (int i = 0; i < countMainan; i++)
+        {
+            if (i < levelShelf)
+            {
+                uiManager.SetUpSpecialUI(i, true);
+            }
+            else
+            {
+                uiManager.SetUpSpecialUI(i, false);
+            }
+        }
+    }
+
+    public void SetUpStockShelf(List<int> listStockCollect)
+    {
+        //Debug.Log("Set up Stock");
+        for (int i = 0; i < listShelfController.Count; i++)
+        {
+            //Debug.Log("Current Stock + " + listShelfController[i].CurrentStock + " | Increment " + listStockCollect[i]);
+
+            listShelfController[i].CurrentStock += listStockCollect[i];
         }
     }
 
@@ -77,9 +111,20 @@ public class ShelfManager : MonoBehaviour
     {
         ShelfController shelf = GetShelfController(mainan);
 
-        if (shelf != null)
-            return shelf.GetPriceMainan();
+        //Cek jika harga 2x lipa
+        bool isSpecialActive = SaveManager.instance.GetSpecialActive(mainan);
 
+
+        if (shelf != null)
+        {
+            int price = shelf.GetPriceMainan();
+            if (isSpecialActive)
+            {
+                price *= 2;
+            }
+
+            return price;
+        }
 
         Debug.LogError("Shelf Null");
         return -1;
@@ -125,24 +170,59 @@ public class ShelfManager : MonoBehaviour
         return listMainan;
     }
 
-
-    public void UnlockShelf()
+    public int GetStockShelf(Mainan mainan)
     {
-        //Play MiniGame
-        //SaveManager.instance.LevelUpShelf();
-        //Misal berhasil unlock Shelf
-        //SetShelf();
-
-        //Pop Up??
-
-        //Change Scene
-        ScenesManager.instance.ChangeScene("MiniGame");
+        int index = DatabaseManager.instance.GetIndexMainan(mainan);
+        return GetStockShelf(index);
     }
 
-    public void CheatUnlockShelf()
+    public int GetStockShelf(int index)
     {
-        SaveManager.instance.LevelUpShelf();
-        //Misal berhasil unlock Shelf
-        SetShelf();
+        return listShelfController[index].CurrentStock;
+    }
+
+    public bool IsAllShelfStockEmpty()
+    {
+        bool isEmpty = true;
+        for (int i = 0; i < listShelfController.Count; i++)
+        {
+            if(GetStockShelf(i) > 0)
+            {
+                isEmpty = false;
+                break;
+            }
+        }
+
+        return isEmpty;
+    }
+
+
+    public void OnDecrementStock()
+    {
+        if(IsAllShelfStockEmpty())
+        {
+            //Tutup Toko
+            GameManager.instance.ClosedShop();
+        }
+    }
+
+    // Event
+    public void OnDecrementStockRandomMainan(EventChoiceMessage message)
+    {
+        for (int i = 0; i < listShelfController.Count; i++)
+        {
+            if (GetStockShelf(i) > 0)
+            {
+                if(listShelfController[i].DecrementStok())
+                {
+                    //Debug.Log("Event Anak Malang, Berhasil Mengurangi Mainan");
+                }
+                else
+                {
+                    //Debug.Log("Event Anak Malang, Gagal Mengurangi Mainan");
+                }
+                break;
+            }
+        }
     }
 }

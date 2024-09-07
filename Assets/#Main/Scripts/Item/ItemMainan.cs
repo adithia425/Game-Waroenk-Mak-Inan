@@ -13,19 +13,18 @@ public class ItemMainan : MonoBehaviour
     public int maxLevelPrice;
 
 
-    [HideInInspector]
+/*    [HideInInspector]
     public int timerRestock;
     public int levelTimerRestock;
-    public int maxLevelTimerRestock;
+    public int maxLevelTimerRestock;*/
 
-    [HideInInspector]
-    public int maxStock;
+/*    public int maxStock;*/
 
-    public int costPrice;
-    public int upgradePrice;
+    public int constPrice;
+    //public int upgradePrice;
 
-    public int costTimerRestock;
-    public int upgradeTimerRestock;
+/*    public int costTimerRestock;
+    public int upgradeTimerRestock;*/
 
     public int GetCurrentPrice()
     {
@@ -35,7 +34,7 @@ public class ItemMainan : MonoBehaviour
     {
         return basePrice * (levelPrice + 1);
     }
-    public float GetTimmerRestock()
+/*    public float GetTimmerRestock()
     {
         float finalTime = timerRestock;
         for (int i = 0; i < levelTimerRestock - 1; i++)
@@ -44,8 +43,8 @@ public class ItemMainan : MonoBehaviour
         }
 
         return finalTime;
-    }
-    public float GetNextTimmerRestock()
+    }*/
+/*    public float GetNextTimmerRestock()
     {
         float finalTime = timerRestock;
         for (int i = 0; i < levelTimerRestock; i++)
@@ -55,35 +54,36 @@ public class ItemMainan : MonoBehaviour
 
         return finalTime;
     }
-
+*/
     public int GetUpgradePriceCost()
     {
         //return GetCurrentPrice() * costPrice;
-        return basePrice * (levelPrice + 1) * costPrice;
+        //Debug.Log(typeMainan + " " +basePrice + "-" + levelPrice + "-" + constPrice);
+        return basePrice * (levelPrice) * constPrice;
     }
-    public int GetUpgradeTimerRestockCost()
+/*    public int GetUpgradeTimerRestockCost()
     {
         return levelTimerRestock * costTimerRestock;
-    }
+    }*/
 
     public void UpgradeLevelPrice()
     {
         levelPrice++;
     }
-    public void UpgradeLevelTimerRestock()
+/*    public void UpgradeLevelTimerRestock()
     {
         levelTimerRestock++;
-    }
+    }*/
 
     public bool isPriceLevelMax()
     {
         return levelPrice >= maxLevelPrice;
     }
 
-    public bool isTimerRestockLevelMax()
+/*    public bool isTimerRestockLevelMax()
     {
         return levelTimerRestock >= maxLevelTimerRestock;
-    }
+    }*/
 /*    public bool isTimerRestockLevelMax()
     {
         return GetTimmerRestock() == 1;
@@ -100,5 +100,14 @@ public enum Mainan
     KERTAS_BINDER,
     BEKEL,
     GASING,
-    LAYANGAN
+    LAYANGAN,
+    STIK_ESKRIM_SPECIAL,
+    LEM_GELEMBUNG_SPECIAL,
+    KINCIR_ANGIN_SPECIAL,
+    KARTU_TOS_SPECIAL,
+    KELERENG_SPECIAL,
+    KERTAS_BINDER_SPECIAL,
+    BEKEL_SPECIAL,
+    GASING_SPECIAL,
+    LAYANGA_SPECIALN
 }

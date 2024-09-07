@@ -10,8 +10,8 @@ public class CanvasMiniGame : MonoBehaviour
 
 
     public GameObject panelTutorial;
-    public GameObject panelWin;
-    public GameObject panelLose;
+    public GameObject panelDone;
+    public GameObject panelTimeEnd;
 
     public GameObject panelTimer;
     void Start()
@@ -34,14 +34,16 @@ public class CanvasMiniGame : MonoBehaviour
     {
         panelTutorial.SetActive(con);
     }
-    public void PanelWin(bool con)
+    public void PanelDone(bool con)
     {
-        panelWin.SetActive(con);
+        panelDone.SetActive(con);
     }
-    public void PanelLose(bool con)
+
+    public void PanelTimeEnd(bool con)
     {
-        panelLose.SetActive(con);
+        panelTimeEnd.SetActive(con);
     }
+
     public void PanelTimer(bool con)
     {
         panelTimer.SetActive(con);
