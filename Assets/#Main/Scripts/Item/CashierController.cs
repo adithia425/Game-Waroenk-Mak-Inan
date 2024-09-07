@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class CashierController : MonoBehaviour
 {
+    public VFXManager vfxManagerMoney;
+    public Transform posVFX;
+
     public Transform[] queuePositions; // Array untuk menyimpan posisi antrian
     public List<GameObject> npcQueue = new List<GameObject>(); // Antrian NPC
 
@@ -38,23 +41,6 @@ public class CashierController : MonoBehaviour
 
     private void UpdateQueuePositions()
     {
-/*        int index = 0;
-        foreach (GameObject npc in npcQueue)
-        {
-            //npc.transform.position = queuePositions[index].position;
-
-            npc.GetComponent<NpcController>().SetPosTarget(queuePositions[index]);
-*//*            if (index == 0)
-            {
-
-                npc.GetComponent<NpcController>().SetPosTarget(queuePositions[index], ActionNPC.PAY);
-                Debug.Log(npc.name + " To First Queue");
-            }    
-            else
-                npc.GetComponent<NpcController>().SetPosTarget(queuePositions[index], ActionNPC.QUEUE);*//*
-
-            index++;
-        }*/
 
         for (int i = 0; i < npcQueue.Count; i++)
         {
@@ -67,5 +53,10 @@ public class CashierController : MonoBehaviour
             else
                 npcQueue[i].GetComponent<NpcController>().SetPosTarget(queuePositions[i], ActionNPC.QUEUE);
         }
+    }
+
+    public void ShowMoneyVFX()
+    {
+        vfxManagerMoney.GetVFX(posVFX);
     }
 }

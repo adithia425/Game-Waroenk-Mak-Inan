@@ -10,6 +10,14 @@ public class ButtonMiniGame : MonoBehaviour
     public Image imageMainan;
 
     public Sprite spriteTransparant;
+    public GameObject effectSpecial;
+
+    public GameObject effectCollectSpecial;
+    public GameObject panelImage;
+
+
+    [Header("Data")]
+    public bool isSpecials;
     void Start()
     {
         GetComponent<Button>().onClick.AddListener(() =>
@@ -18,31 +26,50 @@ public class ButtonMiniGame : MonoBehaviour
         });
     }
 
-    public void SetMainan(Mainan mainan, Sprite sprite)
+    public void SetMainan(Mainan mainan, Sprite sprite, bool isSpecials)
     {
         typeMainan = mainan;
         imageMainan.sprite = sprite;
+        this.isSpecials = isSpecials;
+
+
+        panelImage.SetActive(true);
+        effectSpecial.SetActive(isSpecials);
+        effectCollectSpecial.SetActive(false);
     }
 
     public void Clicked()
     {
         if (!miniGameManager.playerCanClick) return;
-        miniGameManager.PlayerClicked();
 
-        HideImage();
-        if(miniGameManager.targetMainan == typeMainan)
+        if (isSpecials)
         {
-            //Random, benar
-            miniGameManager.PlayerCorrect();
+            MusicManager.instance.PlaySFX(SFX.SFXMGSE);
+            int indexMainan = DatabaseManager.instance.GetIndexMainan(typeMainan);
+            SaveManager.instance.AddStockSpecial(indexMainan - DatabaseManager.instance.countMainanInGame);
+
+            effectSpecial.SetActive(false);
+            effectCollectSpecial.SetActive(true);
         }
         else
         {
-            //Penalty
+            miniGameManager.SetPlayerCantClicked();
+            if (miniGameManager.targetMainan == typeMainan)
+            {
+                //Random, benar
+                miniGameManager.PlayerCorrect();
+            }
+            else
+            {
+                MusicManager.instance.PlaySFX(SFX.SFXMGWRONG);
+            }
         }
+
+        HideImage();
     }
 
     public void HideImage()
     {
-        imageMainan.sprite = spriteTransparant;
+        panelImage.SetActive(false);
     }
 }

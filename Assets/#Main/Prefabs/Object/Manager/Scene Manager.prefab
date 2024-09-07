@@ -43,6 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aafb946ce40eca47855e5b3b73bc730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelLoading: {fileID: 0}
   nameScene: 
-  timeDelay: 2
+  timeDelay: 3
+  panelLoading: {fileID: 0}
+  onChangeScene:
+    m_PersistentCalls:
+      m_Calls: []

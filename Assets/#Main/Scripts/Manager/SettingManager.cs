@@ -8,10 +8,15 @@ public class SettingManager : MonoBehaviour
     public Slider volumeSlider;
 
     public Button[] listButtonQuality;
+
+    public Sprite spriteButtonNormal;
+    public Sprite spriteButtonPressed;
     void Start()
     {
         CheckQuality();
         volumeSlider.onValueChanged.AddListener(SetVolume);
+
+        RefreshSetting();
     }
 
     public void CheckQuality()
@@ -25,6 +30,8 @@ public class SettingManager : MonoBehaviour
         {
             int val = 2;
             SetQuality(val);
+
+            MusicManager.instance.SetVolume(0.3f);
         }
     }
     public void RefreshSetting()
@@ -51,11 +58,11 @@ public class SettingManager : MonoBehaviour
         {
             if(i == index)
             {
-                listButtonQuality[i].interactable = false;
+                listButtonQuality[i].image.sprite = spriteButtonPressed;
             }
             else
             {
-                listButtonQuality[i].interactable = true;
+                listButtonQuality[i].image.sprite = spriteButtonNormal;
             }
         }
     }

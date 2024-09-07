@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class ButtonSound : MonoBehaviour
 {
+    public SFX sfx;
+
     void Start()
     {
         GetComponent<Button>().onClick.AddListener(() =>
         {
-            MusicManager.instance.PlaySFX(SFX.BUTTONUPGRADE);
+            MusicManager.instance.PlaySFX(sfx);
         });
     }
 }

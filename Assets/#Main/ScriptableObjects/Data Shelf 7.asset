@@ -16,9 +16,9 @@ MonoBehaviour:
   nameMainan: Bekel
   descMainan: Adu ketangkasan tangan dengan memantulkan bola karet kecil dan mengambil
     biji.
-  price: 14
-  stok: 12
-  timerRestock: 8
-  priceToUnlock: 81900
+  price: 100
+  priceToUnlock: 500
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 8
+  isSpecialActive: 0

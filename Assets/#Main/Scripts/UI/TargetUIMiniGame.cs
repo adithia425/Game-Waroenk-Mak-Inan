@@ -5,7 +5,7 @@ using UnityEngine;
 public class TargetUIMiniGame : MonoBehaviour
 {
     public RectTransform content; // Referensi ke RectTransform dari konten Scroll View
-    public float moveDistance = 190f; // Jarak yang akan digerakkan setiap kali tombol spasi ditekan
+    public float moveDistance; // Jarak yang akan digerakkan setiap kali tombol spasi ditekan
     public float moveDuration = 1f; // Durasi pergerakan dalam detik
 
     public void MoveContent()

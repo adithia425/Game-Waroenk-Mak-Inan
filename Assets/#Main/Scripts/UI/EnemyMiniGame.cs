@@ -94,9 +94,11 @@ public class EnemyMiniGame : MonoBehaviour
     public void SetUp(bool isCorrect,bool isLeft, Transform posSpawn, ButtonMiniGame objectCorrect, float timeAction)
     {
         //StopCoroutine(MoveImageTangan());
-
+/*
         float offsetSpawn = Random.Range(-rangeVerticalSpawn, rangeVerticalSpawn);
-        transform.position = new Vector3(posSpawn.position.x, offsetSpawn, posSpawn.position.z);
+        transform.position = new Vector3(posSpawn.position.x, offsetSpawn, posSpawn.position.z);*/
+
+        transform.position = posSpawn.position;
 
         this.isCorrect = isCorrect;
         this.objectCorrect = objectCorrect;

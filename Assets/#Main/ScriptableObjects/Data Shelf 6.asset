@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 5
   nameMainan: Kertas Binder
   descMainan: Kertas dengan berbagai hiasan dan gambar lucu untuk dikoleksi.
-  price: 10
-  stok: 12
-  timerRestock: 8
-  priceToUnlock: 22950
+  price: 75
+  priceToUnlock: 400
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 7
+  isSpecialActive: 0

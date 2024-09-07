@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 4
   nameMainan: Kelereng
   descMainan: Bola-bola kaca berwarna-warni kecil untuk bermain bidik.
-  price: 7
-  stok: 12
-  timerRestock: 8
-  priceToUnlock: 21900
+  price: 50
+  priceToUnlock: 300
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 6
+  isSpecialActive: 0

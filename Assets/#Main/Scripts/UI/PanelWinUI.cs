@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PanelWinUI : MonoBehaviour
 {
-
+/*
     public TextMeshProUGUI textTitle;
     public TextMeshProUGUI textDesc;
 
@@ -36,5 +36,5 @@ public class PanelWinUI : MonoBehaviour
         textPrice.text = "Harga : " + dataMainan.price.ToString() + " RP";
         textStok.text = "Jumlah Stok : " + dataMainan.stok.ToString();
         textTimeRestock.text = "Waktu Re-stock : " + dataMainan.timerRestock.ToString() + " Detik";
-    }
+    }*/
 }

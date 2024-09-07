@@ -55,13 +55,13 @@ MonoBehaviour:
   timerDelayStart: 0.5
   rangeVerticalSpawn: 420
   listSpriteLeftHand:
-  - {fileID: 21300000, guid: 8d78fedfb0c813743acfa9d482099896, type: 3}
-  - {fileID: 21300000, guid: 8a2ceb4be267fcc4488ea52a1a84f1e0, type: 3}
-  - {fileID: 21300000, guid: ca6faf1a63e4dfb41bd8bc5301a23a99, type: 3}
+  - {fileID: 21300000, guid: 174a2da6dc454ac49adf69db50238d2e, type: 3}
+  - {fileID: 21300000, guid: 719e9251f3ca45d4a8f57a4810678709, type: 3}
+  - {fileID: 21300000, guid: 1869b889b22c08643a47d361842e793c, type: 3}
   listSpriteRightHand:
-  - {fileID: 21300000, guid: 6eb702ca9cef39d48a760feb544ee53f, type: 3}
-  - {fileID: 21300000, guid: e5eb91855a82ba0448f97ab973f89a4f, type: 3}
-  - {fileID: 21300000, guid: b309a2e345d491b46b291b562e3c1c62, type: 3}
+  - {fileID: 21300000, guid: 440b09e3984709e429a69cb7728eb8c3, type: 3}
+  - {fileID: 21300000, guid: d2f18420a3ac4164fbcce85974c9825a, type: 3}
+  - {fileID: 21300000, guid: 279c9824d1d541c489cba02d020f1476, type: 3}
   objectCorrect: {fileID: 0}
   posisiTangan: {fileID: 3267230762094923476}
   imageTangan: {fileID: 3267230762094923475}
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6eb702ca9cef39d48a760feb544ee53f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 174a2da6dc454ac49adf69db50238d2e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

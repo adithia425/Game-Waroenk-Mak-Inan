@@ -39,7 +39,10 @@ public class SendalMovement : MonoBehaviour
         // Cek apakah objek sudah sampai di titik tujuan
         if (Vector3.Distance(transform.position, target.position) < 0.01f)
         {
-            Instantiate(objectEffectLedak, transform.position, Quaternion.identity);
+            GameManager.instance.thiefManager.isShooting = false;
+
+            GameObject effect = Instantiate(objectEffectLedak, transform.position, Quaternion.identity);
+            Destroy(effect, 1);
             npc.ActionThieFailedDone();
             isMoving = false;
             gameObject.SetActive(false);

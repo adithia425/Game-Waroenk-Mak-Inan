@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 7
   nameMainan: Gasing
   descMainan: Mainan dari kayu yang berputar-putar pada porosnya.
-  price: 18
-  stok: 12
-  timerRestock: 8
-  priceToUnlock: 132300
+  price: 150
+  priceToUnlock: 600
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 9
+  isSpecialActive: 0

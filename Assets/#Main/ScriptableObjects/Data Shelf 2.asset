@@ -15,8 +15,9 @@ MonoBehaviour:
   mainan: 1
   nameMainan: Lem Gelembung
   descMainan: Lem yang dapat ditiup menjadi gelembung besar dan tahan lama.
-  price: 3
-  stok: 5
-  timerRestock: 5
+  price: 12
+  priceToUnlock: 0
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 3
+  isSpecialActive: 0

@@ -9,6 +9,11 @@ public class PanelThief : MonoBehaviour
     public RectTransform dot; // The RectTransform of the moving dot
     public float tolerance; // Tolerance for considering the dot to be in the middle
 
+    public void OnEnable()
+    {
+        GameManager.instance.CheckTurnOffFastTime();
+    }
+
     public void CheckDotPosition()
     {
         NpcController npcStun = npc.GetComponent<NpcController>();
@@ -17,12 +22,12 @@ public class PanelThief : MonoBehaviour
         float dotPositionX = dot.anchoredPosition.x;
         if (Mathf.Abs(dotPositionX) <= tolerance)
         {
-            Debug.Log("OK");
+            Debug.Log("Klik Thief Success");
             npcStun.ActionThiefFailed();
         }
         else
         {
-            Debug.Log("Gagal");
+            Debug.Log("Klik Thief Failed");
             npcStun.ActionThiefSuccess();
         }
 

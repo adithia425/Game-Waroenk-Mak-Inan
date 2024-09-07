@@ -8,19 +8,26 @@ public class MiniGameManager : MonoBehaviour
     public CanvasMiniGame canvas;
     public TargetUIMiniGame targetUI;
 
+    [SerializeField]
     private List<Mainan> listMainan;
-    public Sprite[] listSprites; // Array of sprites
+    [SerializeField]
+    private List<Mainan> availableMainan;
+    public Sprite[] listBoxNoOutline;
+    public Sprite[] listBoxWithOutline; // Array of sprites
     public ButtonMiniGame[] listButtonMiniGame; // Array of existing UI Image objects
 
     [Header("Main")]
-    public bool isTesting;
+    public int countMainanChoosed;
     public int currentLevelMainan;
     public bool isPlaying;
     public float timeLimit = 3.0f; // Time limit for player to click
     public int counterIndexTarget = 0;
     public bool playerCanClick;
     public bool gameEnd;
-    private int targetIndexPosisiImage;
+    [SerializeField]
+    private int targetIndexPosisiImage; //Index target mainan
+    [SerializeField]
+    private int indexMainanSpecials; // Index mainan emas
     private float timer;
 
     public Mainan targetMainan;
@@ -49,14 +56,25 @@ public class MiniGameManager : MonoBehaviour
     public int[] listDurasiGame;
     public float[] listKecepatanTangan;
 
+    public float chanceMainanSpecials;
+
+
+
+    [Header("VFX")]
+    public GameObject vfxGameEnd;
+
     void Start()
     {
-        //Get dari playerpref
-
-        levelUnlockMainan = SaveManager.instance.listDataShelf.levelShelf;
-
         canvas.PanelTutorial(true);
 
+        //Reset Database mainan collected
+        DatabaseManager.instance.ResetListMainanCollected();
+
+        //Get dari playerpref
+        levelUnlockMainan = SaveManager.instance.listDataShelf.levelShelf;
+
+
+        //Isi data list Mainan
         listMainan = new List<Mainan>();
 
         foreach (Mainan mainan in System.Enum.GetValues(typeof(Mainan)))
@@ -64,6 +82,7 @@ public class MiniGameManager : MonoBehaviour
             listMainan.Add(mainan);
         }
 
+        availableMainan = listMainan.GetRange(0, Mathf.Min(levelUnlockMainan, listMainan.Count));
 
         RandomTargetList();
         RandomMainan();
@@ -73,6 +92,10 @@ public class MiniGameManager : MonoBehaviour
     {
         isReadyGame = true;
         counterTime = 1;
+
+
+        MusicManager.instance.PlaySFX(SFX.MG321);
+
         imageReady.gameObject.SetActive(true);
         canvas.PanelTutorial(false);
 
@@ -102,7 +125,7 @@ public class MiniGameManager : MonoBehaviour
                 break;
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.1f);
 
         if (isReadyGame)
         { 
@@ -126,19 +149,6 @@ public class MiniGameManager : MonoBehaviour
         RandomMainan();
     }
 
-    private void RandomTargetList()
-    {
-        listTargetMainan = new List<Mainan>();
-
-        List<Mainan> availableMainan = listMainan.GetRange(0, Mathf.Min(levelUnlockMainan, listMainan.Count));
-
-        for (int i = 0; i < 20; i++)
-        {
-            int randomIndex = Random.Range(0, availableMainan.Count);
-            listTargetMainan.Add(availableMainan[randomIndex]);
-            listTargetImage[i].sprite = listSprites[randomIndex];
-        }
-    }
 
     private void SetEnemy()
     {
@@ -193,9 +203,7 @@ public class MiniGameManager : MonoBehaviour
         }
         else
         {
-            gameEnd = true;
-            canvas.PanelTimer(false);
-            canvas.PanelLose(true);
+            TimeEnd();
         }
     }
 
@@ -215,7 +223,6 @@ public class MiniGameManager : MonoBehaviour
         if(!isReadyGame) playerCanClick = true;
 
 
-        targetIndexPosisiImage = Random.Range(0, listButtonMiniGame.Length);
 
         targetMainan = listTargetMainan[counterIndexTarget];
 
@@ -223,13 +230,38 @@ public class MiniGameManager : MonoBehaviour
         Mainan[] mainanArray = (Mainan[])System.Enum.GetValues(typeof(Mainan));
         int indexTargetMainan = System.Array.IndexOf(mainanArray, targetMainan);
 
-        listButtonMiniGame[targetIndexPosisiImage].SetMainan(targetMainan, listSprites[indexTargetMainan]);
+        //Random posisi mainan target
+        targetIndexPosisiImage = Random.Range(0, listButtonMiniGame.Length);
+
+        listButtonMiniGame[targetIndexPosisiImage].SetMainan(targetMainan, listBoxNoOutline[indexTargetMainan], false);
+
+
+        //Random apakah akan muncul mainan specials
+        bool isActiveSpecials = Random.Range(0, 100) < chanceMainanSpecials ? true : false;
+
+        if (gameEnd) isActiveSpecials = false;
+
+        int indexPosisiSpecial = - 1;
+        if (isActiveSpecials)
+        {
+            //random indexSpecial
+            indexPosisiSpecial = Random.Range(0, listButtonMiniGame.Length);
+            if (indexMainanSpecials == targetIndexPosisiImage) indexMainanSpecials--;
+
+            //List mainan yg ke unlock
+            // 9 karena ada 9 mainan biasa
+            int randomIndexSpecial = DatabaseManager.instance.countMainanInGame + Random.Range(0, availableMainan.Count);
+            Debug.Log($"Index {indexPosisiSpecial} Spesial {listMainan[randomIndexSpecial]}");
+
+            listButtonMiniGame[indexPosisiSpecial].SetMainan(listMainan[randomIndexSpecial], listBoxNoOutline[randomIndexSpecial], true);
+        }
 
         for (int i = 0; i < listButtonMiniGame.Length; i++)
         {
-            if (i != targetIndexPosisiImage)
+            if (i != targetIndexPosisiImage && i != indexPosisiSpecial)
             {
-                int randomIndex = Random.Range(0, listSprites.Length);
+                
+                int randomIndex = Random.Range(0, listBoxNoOutline.Length / 2);
                 if (randomIndex == indexTargetMainan)
                 {
                     if (randomIndex == 0)
@@ -237,7 +269,9 @@ public class MiniGameManager : MonoBehaviour
                     else
                         randomIndex--;
                 }
-                listButtonMiniGame[i].SetMainan(listMainan[randomIndex], listSprites[randomIndex]);
+
+                listButtonMiniGame[i].SetMainan(listMainan[randomIndex], listBoxNoOutline[randomIndex], false);
+                
             }
         }
 
@@ -245,7 +279,7 @@ public class MiniGameManager : MonoBehaviour
             SetEnemy();
     }
 
-    public void PlayerClicked()
+    public void SetPlayerCantClicked()
     {
         playerCanClick = false;
     }
@@ -254,43 +288,61 @@ public class MiniGameManager : MonoBehaviour
         if (!isPlaying) return;
         isPlaying = false;
 
+        MusicManager.instance.PlaySFX(SFX.SFXMGCORRECT);
+
+        int indexTargetMainan = DatabaseManager.instance.GetIndexMainan(targetMainan);
+        DatabaseManager.instance.AddListMainanCollected(indexTargetMainan, DatabaseManager.instance.counterCollectedStockMainan);
+
         counterIndexTarget++;
         targetUI.MoveContent();
 
-
-        //listTargetMainan.Count
-        if(isTesting)
+        if (counterIndexTarget >= countMainanChoosed)
         {
-            GameWinDone();
+            GameDone();
             return;
         }
-        else
-        {
-            if (counterIndexTarget >= listTargetMainan.Count)
-            {
-                GameWinDone();
-                return;
-            }
-        }
+        
 
 
         RandomMainan();
     }
 
-
-    private void GameWinDone()
+    private void TimeEnd()
     {
-        Debug.Log("Game Win");
-        canvas.PanelTimer(false);
-        canvas.PanelWin(true);
-        gameEnd = true;
+        canvas.PanelTimeEnd(true);
 
+        TriggerEnding();
+    }
+    private void GameDone()
+    {
+        canvas.PanelDone(true);
+
+        TriggerEnding();
         //Unlock Mainan
-        int levelShelf = SaveManager.instance.listDataShelf.levelShelf;
-        int costUpgrade = SaveManager.instance.listDataShelf.dataShelf[levelShelf].priceToUnlock;
-        SaveManager.instance.AddMoney(-costUpgrade);
-        SaveManager.instance.LevelUpShelf();
-        MusicManager.instance.PlaySFX(SFX.WINMINIGAME);
+        /*        int levelShelf = SaveManager.instance.listDataShelf.levelShelf;
+                int costUpgrade = SaveManager.instance.listDataShelf.dataShelf[levelShelf].priceToUnlock;
+                SaveManager.instance.AddMoney(-costUpgrade);
+                SaveManager.instance.LevelUpShelf();*/
+
+    }
+
+    public void TriggerEnding()
+    {
+        MusicManager.instance.PlaySFX(SFX.DONEMINIGAME);
+
+        canvas.PanelTimer(false);
+        vfxGameEnd.SetActive(true);
+
+        gameEnd = true;
+        PlayerPrefs.SetInt("PlayMiniGame", 1);
+
+        Invoke(nameof(BackToGamePlay), 3f);
+    }
+
+
+    private void BackToGamePlay()
+    {
+        ScenesManager.instance.ChangeScene("GamePlay");
     }
     public void EnemyCorrect()
     {
@@ -303,8 +355,11 @@ public class MiniGameManager : MonoBehaviour
 
     public void Swipe()
     {
-        panelSwipe.GetComponent<Animator>().SetTrigger("Play");
-
+        if (panelSwipe.activeInHierarchy)
+        {
+            MusicManager.instance.PlaySFX(SFX.MGSWIPE);
+            panelSwipe.GetComponent<Animator>().SetTrigger("Play");
+        }
         //Invoke(nameof(HidePanelSwipe), 1.1f);
     }
 
@@ -312,4 +367,85 @@ public class MiniGameManager : MonoBehaviour
     {
         panelSwipe.SetActive(false);
     }
+
+
+    #region Setup Target Mainan
+
+    //Set Target List Mainan
+    private void RandomTargetList()
+    {
+        listTargetMainan = new List<Mainan>();
+/*
+        List<Mainan> availableMainan = listMainan.GetRange(0, Mathf.Min(levelUnlockMainan, listMainan.Count));
+
+        for (int i = 0; i < 20; i++)
+        {
+            int randomIndex = Random.Range(0, availableMainan.Count);
+            listTargetMainan.Add(availableMainan[randomIndex]);
+            listTargetImage[i].sprite = listBoxWithOutline[randomIndex];
+        }
+*/
+
+        countMainanChoosed = DatabaseManager.instance.countMainanChoosed;
+        List<int> choosedListMainan = DatabaseManager.instance.listCounterMainanMiniGame;
+
+
+        List<int> listSortInteger = ConvertToListTarget(choosedListMainan);
+
+        List<int> listRandomInteger = Shuffle(listSortInteger);
+
+        listTargetMainan = ConvertIntListToEnumList(listRandomInteger);
+
+        for (int i = 0; i < countMainanChoosed; i++)
+        {
+            listTargetImage[i].sprite = listBoxWithOutline[listRandomInteger[i]];
+        }
+    }
+
+    List<int> ConvertToListTarget(List<int> originalList)
+    {
+        List<int> result = new List<int>();
+
+        for (int i = 0; i < originalList.Count; i++)
+        {
+            for (int j = 0; j < originalList[i]; j++)
+            {
+                result.Add(i);
+            }
+        }
+
+        return result;
+    }
+
+    List<int> Shuffle(List<int> list)
+    {
+        List<int> shuffledList = new List<int>(list);
+
+        // Mengacak elemen-elemen di dalam list
+        for (int i = 0; i < shuffledList.Count; i++)
+        {
+            int randomIndex = Random.Range(0, shuffledList.Count);
+            int temp = shuffledList[i];
+            shuffledList[i] = shuffledList[randomIndex];
+            shuffledList[randomIndex] = temp;
+        }
+
+        return shuffledList;
+    }
+
+    List<Mainan> ConvertIntListToEnumList(List<int> listInt)
+    {
+        List<Mainan> listEnum = new List<Mainan>();
+
+        foreach (int index in listInt)
+        {
+            // Mengonversi integer ke enum dan menambahkannya ke list enum
+            listEnum.Add((Mainan)index);
+        }
+
+        return listEnum;
+    }
+
+
+    #endregion
 }

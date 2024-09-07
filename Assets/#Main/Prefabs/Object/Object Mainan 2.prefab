@@ -55,10 +55,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object Mainan 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4703150250913162319, guid: f2b9b474b2ff5c449b4f8e0a07f01a01, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3986a437fc3f4224a85eb19f901f5f39, type: 2}
     - target: {fileID: 4977244901589165962, guid: f2b9b474b2ff5c449b4f8e0a07f01a01, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 06e5994752ab1c642aac16c1462c2a2a, type: 2}
+    - target: {fileID: 5565648250608567110, guid: f2b9b474b2ff5c449b4f8e0a07f01a01, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6214364853489099411, guid: f2b9b474b2ff5c449b4f8e0a07f01a01, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

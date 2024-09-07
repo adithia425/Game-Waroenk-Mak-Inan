@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 2
   nameMainan: Kincir Angin
   descMainan: Plastik warna-warni yang berputar saat tertiup angin.
-  price: 4
-  stok: 8
-  timerRestock: 7
-  priceToUnlock: 25
+  price: 15
+  priceToUnlock: 100
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 4
+  isSpecialActive: 0

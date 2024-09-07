@@ -15,9 +15,9 @@ MonoBehaviour:
   mainan: 3
   nameMainan: Kartu Tos
   descMainan: Tanding kartu bergambar dengan di-tos-kan dengan kartu lawan.
-  price: 5
-  stok: 8
-  timerRestock: 7
-  priceToUnlock: 13900
+  price: 30
+  priceToUnlock: 200
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 5
+  isSpecialActive: 0

@@ -16,9 +16,9 @@ MonoBehaviour:
   nameMainan: Layangan
   descMainan: Rangkaian bambu dan kertas yang diterbangkan angin dan dikendalikan
     benang.
-  price: 23
-  stok: 20
-  timerRestock: 10
-  priceToUnlock: 197100
+  price: 225
+  priceToUnlock: 700
   levelPrice: 1
-  levelRestock: 1
+  stockBoxSpecial: 0
+  costConsumeBoxSpecial: 10
+  isSpecialActive: 0
